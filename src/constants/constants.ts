@@ -1,0 +1,16 @@
+const DEFAULT_POKEMON_GENERATION = 'generation-i'
+const DEFAULT_POKEMON_FILTER_TYPE = 'all'
+
+const FETCH_ALL_POKEMONS_BY_GENERATION_KEY = 'fetch-all-pokemons-by-generations'
+const FETCH_ALL_GENERATIONS_KEY = 'fetch-all-generations'
+const FETCH_POKEMONS_BY_GENERATION_KEY = 'fetch-pokemons-by-generations'
+const FETCH_POKEMONS_TYPES = 'fetch-pokemons-types'`
+`
+export {
+    DEFAULT_POKEMON_FILTER_TYPE,
+    DEFAULT_POKEMON_GENERATION,
+    FETCH_ALL_POKEMONS_BY_GENERATION_KEY,
+    FETCH_ALL_GENERATIONS_KEY,
+    FETCH_POKEMONS_BY_GENERATION_KEY,
+    FETCH_POKEMONS_TYPES
+}
