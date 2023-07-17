@@ -1,26 +1,39 @@
-import {Generation, Pokemon} from "pokedex-promise-v2";
+import {Generation, GenerationName, Pokemon} from "pokedex-promise-v2";
 import {useQuery} from "react-query";
 import {
+    DEFAULT_LANGUAGE,
     FETCH_ALL_GENERATIONS_KEY,
     FETCH_ALL_POKEMONS_BY_GENERATION_KEY,
-    FETCH_POKEMONS_BY_GENERATION_KEY, FETCH_POKEMONS_TYPES
+    FETCH_POKEMONS_BY_GENERATION_KEY,
+    FETCH_POKEMONS_TYPES
 } from "../constants/constants";
+import axios from "axios";
+import generations from "../redux/reducers/generations";
 
 
 const ApiService = (): any => {
-    const baseUrl = process.env.API_ENDPOINT
+    const baseUrl = 'http://localhost:4000'
+
     /**
      *
      *
      */
     async function fetchAllGenerations(): Promise<Generation[]> {
         try {
-
+            const {data} = await axios.get(`${baseUrl}/generations`,
+                {
+                    headers: {
+                        "Content-Type": 'application/json'
+                    }
+                }
+            );
+            return data as Generation[]
         } catch (e) {
-
+            console.log(e)
         }
         return []
     }
+
     async function fetchAllPokemonsTypes(): Promise<Pokemon[]> {
         try {
 
@@ -31,42 +44,77 @@ const ApiService = (): any => {
     }
 
     /**
-     * Loops trough pages to fetch all pokemons from a given generation
-     * @param generation generation to fetch
-     * @param startPage where to start query pokemons
+     *
+     * @param generation
+     * @param page
+     * @param updateProgress
      */
-    async function fetchAllPokemonsByGeneration(generation: string, startPage: number = 0): Promise<Pokemon[]> {
-        try {
+    async function fetchAllPokemonsByGenerationPage(generation: Generation, page: number = 0, updateProgress: Function) {
+        const totalGenerationPokemons = generation.pokemon_species.length
 
-        } catch (e) {
+        let generationName: string = generation.names.find((generationName: GenerationName) => generationName.language.name as string === DEFAULT_LANGUAGE).name
 
+        const {data: {next, results: pokemons}} = await axios.get(`${baseUrl}/pokemons/${generation.name}/${page}`,
+            {
+                headers: {
+                    "Content-Type": 'application/json'
+                }
+            }
+        );
+
+
+        if (next !== null) {
+            // in between progress
+            updateProgress(generationName, parseInt((pokemons.length / totalGenerationPokemons * 100).toFixed(0)))
+
+            // fetch next page of generation
+            const {data: {next: nextPage, results: newPokemons}} = await fetchAllPokemonsByGenerationPage(generation, next, updateProgress)
+            const pokemonFetched = [...pokemons, ...newPokemons]
+
+            // late progress
+            updateProgress(generationName, parseInt((pokemonFetched.length / totalGenerationPokemons * 100).toFixed(0)))
+
+            return {data: {next: nextPage, results: pokemonFetched}}
+        } else {
+            // final progress end of generation
+            updateProgress(generationName, parseInt((pokemons.length / totalGenerationPokemons * 100).toFixed(0)))
+
+            return {data: {next, results: pokemons}}
         }
-        return []
     }
 
     /**
-     * fetch paginated pokemons from a given generation
-     * @param generation generation to fetch
-     * @param page where to query pokemons
+     * Loops trough pages to fetch all pokemons from a given generation
+     * @param generations generations to fetch
+     * @param updateProgress
      */
-    async function fetchPokemonsByGeneration(generation: string, page: number = 0): Promise<Pokemon[]> {
+    async function fetchAllPokemonsByGeneration(generations: Generation[], updateProgress: Function): Promise<Pokemon[]> {
+        let pokemons = []
         try {
-
+            for (const generation of generations) {
+                const {data: {results: allPokemons}} = await fetchAllPokemonsByGenerationPage(generation, 0, updateProgress)
+                pokemons = [...pokemons, ...allPokemons]
+            }
+            console.log(pokemons.length)
         } catch (e) {
-
+            console.error(e)
+            return []
         }
-        return []
     }
 
-    const useAllPokemonsByGeneration = (generation: string) => useQuery([FETCH_ALL_POKEMONS_BY_GENERATION_KEY], () => fetchAllPokemonsByGeneration(generation,0));
-    const usePokemonsByGeneration = (generation: string) => useQuery([FETCH_POKEMONS_BY_GENERATION_KEY], () => fetchPokemonsByGeneration(generation,0));
+
     const useGenerations = () => useQuery([FETCH_ALL_GENERATIONS_KEY], fetchAllGenerations);
     const usePokemonsTypes = () => useQuery([FETCH_POKEMONS_TYPES], fetchAllPokemonsTypes);
 
     return {
-        usePokemonsByGeneration,
-        useAllPokemonsByGeneration,
+        // requests
+        fetchAllPokemonsByGeneration,
+        fetchAllGenerations,
+        fetchAllPokemonsTypes,
+        // react-query
         useGenerations,
         usePokemonsTypes
     }
 }
+
+export {ApiService}
