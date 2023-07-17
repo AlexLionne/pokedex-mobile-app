@@ -1,12 +1,71 @@
+import React, {JSX, useEffect, useMemo} from "react";
+import {SVGPokeBall} from '../../assets/Pokeball'
+import Animated, {
+    Easing,
+    useAnimatedStyle,
+    useSharedValue,
+    withRepeat,
+    withSequence,
+    withTiming
+} from "react-native-reanimated";
 
-import React, {JSX} from "react";
-
-interface IPokeBall{
-    animated: boolean
+export enum PokeBallAnimations {
+    CATCH = 'CATCH',
+    LINEAR = 'LINEAR'
 }
 
-const PokeBall = React.memo(({animated}: IPokeBall ): JSX.Element => {
-    return <></>
+interface IPokeBall {
+    animation: PokeBallAnimations
+    animated: boolean
+    width: number
+    height: number
+}
+
+const PokeBall = React.memo(({animated, width, height, animation}: IPokeBall): JSX.Element => {
+
+    const offset = useSharedValue<any>(0);
+
+    const animatedStyles = useAnimatedStyle((): {} => {
+        return {
+            transform: [{rotateZ: `${offset.value}deg`}],
+        };
+    }, [offset.value]);
+
+    const pokeballAnimation = withRepeat(
+        withSequence(
+            withTiming(-360 + 'deg', {useNativeDriver: true, duration: 250, easing: Easing.inOut(Easing.linear)}),
+            withTiming(-180 + 'deg', {useNativeDriver: true, duration: 250, easing: Easing.inOut(Easing.linear)}),
+            withTiming(-90 + 'deg', {useNativeDriver: true, duration: 750, easing: Easing.inOut(Easing.linear)}),
+            withTiming(-45 + 'deg', {useNativeDriver: true, duration: 250, easing: Easing.inOut(Easing.linear)}),
+            withTiming(0 + 'deg', {useNativeDriver: true, duration: 100, easing: Easing.inOut(Easing.linear)}),
+            withTiming(20 + 'deg', {useNativeDriver: true, duration: 50, easing: Easing.inOut(Easing.linear)}),
+            withTiming(0 + 'deg', {useNativeDriver: true, duration: 250, easing: Easing.inOut(Easing.linear)}),
+            withTiming(-20 + 'deg', {useNativeDriver: true, duration: 100, easing: Easing.inOut(Easing.linear)}),
+            withTiming(-0 + 'deg', {useNativeDriver: true, duration: 400, easing: Easing.inOut(Easing.linear)}),
+        ), -1)
+
+    const linearAnimation = withRepeat(
+        withSequence(
+            withTiming(0 + 'deg', {useNativeDriver: true, duration: 0, easing: Easing.inOut(Easing.linear)}),
+            withTiming(360 + 'deg', {useNativeDriver: true, duration: 3000, easing: Easing.inOut(Easing.linear)}),
+        ), -1)
+
+    const animationStyle = useMemo<string>(() => {
+        if (animation === PokeBallAnimations.CATCH) return pokeballAnimation
+        if (animation === PokeBallAnimations.LINEAR) return linearAnimation
+
+        return linearAnimation
+    }, [animation])
+
+    useEffect(() => {
+        if (animated) {
+            offset.value = animationStyle
+        }
+    }, [animated, animationStyle])
+
+    return <Animated.View style={[animatedStyles]}>
+        <SVGPokeBall color={'#303943'} opacity={0.05} width={width} height={height}/>
+    </Animated.View>
 }, (p, n) => p.animated === n.animated)
 
 
