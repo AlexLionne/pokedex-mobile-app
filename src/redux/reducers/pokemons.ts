@@ -11,7 +11,7 @@ export interface IPokemonStore {
 
 const initialState: IPokemonStore = {pokemons: [], pokemonsTypes: []};
 
-const pokemonsReducer = (state = initialState, action) => {
+const pokemonsReducer = (state = initialState, action: any) => {
     switch (action.type) {
         /* POKEMONS */
         case SET_POKEMON_BY_GENERATIONS:

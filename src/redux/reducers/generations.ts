@@ -10,10 +10,13 @@ export interface IGenerationsStore {
 const initialState: IGenerationsStore = {generations: []};
 
 
-const generationReducer = (state: IGenerationsStore = initialState, action) => {
+const generationReducer = (state: IGenerationsStore = initialState, action: any) => {
     switch (action.type) {
         case SET_GENERATIONS:
-            return state
+            return {
+                ...state,
+                generation: action.generation
+            }
         default:
             return state;
     }

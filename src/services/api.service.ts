@@ -2,10 +2,7 @@ import {Generation, GenerationName, Pokemon, PokemonType} from "pokedex-promise-
 import {useQuery} from "react-query";
 import {
     DEFAULT_LANGUAGE,
-    FETCH_ALL_GENERATIONS_KEY,
-    FETCH_ALL_POKEMONS_BY_GENERATION_KEY,
-    FETCH_POKEMONS_BY_GENERATION_KEY,
-    FETCH_POKEMONS_TYPES
+    FETCH_ALL_GENERATIONS_KEY
 } from "../constants/constants";
 import axios from "axios";
 
@@ -55,10 +52,11 @@ const ApiService = (): any => {
      * @param page
      * @param updateProgress
      */
-    async function fetchAllPokemonsByGenerationPage(generation: Generation, page: number = 0, updateProgress: Function) {
+    async function fetchAllPokemonsByGenerationPage(generation: Generation, page: number = 0, updateProgress: Function): Promise<{data: {next: number, results: Pokemon[]}}>  {
         const totalGenerationPokemons = generation.pokemon_species.length
 
-        let generationName: string = generation.names.find((generationName: GenerationName) => generationName.language.name as string === DEFAULT_LANGUAGE).name
+        // @ts-ignore
+        let generationName: string  = generation.names.find((generationName: GenerationName) => generationName.language.name as string === DEFAULT_LANGUAGE).name || generation.name
 
         const {data: {next, results: pokemons}} = await axios.get(`${baseUrl}/pokemons/${generation.name}/${page}`,
             {
@@ -95,7 +93,7 @@ const ApiService = (): any => {
      * @param updateProgress
      */
     async function fetchAllPokemonsByGeneration(generations: Generation[], updateProgress: Function): Promise<Pokemon[]> {
-        let pokemons = []
+        let pokemons: Pokemon[] = []
         try {
             for (const generation of generations) {
                 const {data: {results: allPokemons}} = await fetchAllPokemonsByGenerationPage(generation, 0, updateProgress)
@@ -109,8 +107,9 @@ const ApiService = (): any => {
     }
 
 
-    const useGenerations = () => useQuery([FETCH_ALL_GENERATIONS_KEY], fetchAllGenerations);
-    const usePokemonsTypes = () => useQuery([FETCH_POKEMONS_TYPES], fetchAllPokemonsTypes);
+    const useGenerations = () => {
+        useQuery([FETCH_ALL_GENERATIONS_KEY], fetchAllGenerations);
+    }
 
     return {
         // requests
@@ -118,8 +117,7 @@ const ApiService = (): any => {
         fetchAllGenerations,
         fetchAllPokemonTypes,
         // react-query
-        useGenerations,
-        usePokemonsTypes
+        useGenerations
     }
 }
 

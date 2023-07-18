@@ -11,11 +11,25 @@ interface IPokemonCard {
 }
 
 const PokemonCard = React.memo(({pokemon, index}: IPokemonCard): JSX.Element => {
-    const {width, height} = useWindowDimensions()
+    const {width} = useWindowDimensions()
 
     const pokemonName = useMemo(() => pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1, pokemon.name.length), [pokemon.name])
+
+    const backgroundColor = useMemo(() => {
+        const [pokemonType]: any = pokemon.types
+        // @ts-ignore
+        return colors.pokemonTypes[pokemonType].color
+    }, [pokemon])
+
+    const pokemonPreview = useMemo<string | null>(() => {
+        // @ts-ignore
+        return pokemon.sprites.other["official-artwork"].front_default
+    }, [pokemon])
+
+    // @ts-ignore
+    // @ts-ignore
     return <View style={{
-        backgroundColor: colors.pokemonTypes[pokemon.types[0].type.name].color,
+        backgroundColor: backgroundColor,
         marginBottom: 12,
         marginRight: index % 2 ? 0 : 12,
         width: (width / 2) - 30,
@@ -25,7 +39,7 @@ const PokemonCard = React.memo(({pokemon, index}: IPokemonCard): JSX.Element => 
         position: 'relative',
     }}>
         <View style={{flex: 0, flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'flex-end'}}>
-            <Text size={15}>#{pokemon.id}</Text>
+            <Text size={15}>{`#${pokemon.id}`}</Text>
         </View>
         <View style={{
             flex: 0,
@@ -58,7 +72,7 @@ const PokemonCard = React.memo(({pokemon, index}: IPokemonCard): JSX.Element => 
             <FastImage
                 style={{width: 100, minHeight: 120}}
                 source={{
-                    uri: pokemon.sprites.other["official-artwork"].front_default,
+                    uri: pokemonPreview as string,
                     priority: FastImage.priority.normal,
                 }}
                 resizeMode={FastImage.resizeMode.contain}

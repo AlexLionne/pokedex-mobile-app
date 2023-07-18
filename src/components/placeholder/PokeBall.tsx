@@ -45,29 +45,29 @@ const PokeBall = ({animated, width, height, animation}: IPokeBall): JSX.Element 
 
     const pokeballAnimation = withRepeat(
         withSequence(
-            withTiming(-360 + 'deg', {useNativeDriver: true, duration: 250, easing: Easing.inOut(Easing.linear)}),
-            withTiming(-180 + 'deg', {useNativeDriver: true, duration: 250, easing: Easing.inOut(Easing.linear)}),
-            withTiming(-90 + 'deg', {useNativeDriver: true, duration: 750, easing: Easing.inOut(Easing.linear)}),
-            withTiming(-45 + 'deg', {useNativeDriver: true, duration: 250, easing: Easing.inOut(Easing.linear)}),
-            withTiming(0 + 'deg', {useNativeDriver: true, duration: 100, easing: Easing.inOut(Easing.linear)}),
-            withTiming(20 + 'deg', {useNativeDriver: true, duration: 50, easing: Easing.inOut(Easing.linear)}),
-            withTiming(0 + 'deg', {useNativeDriver: true, duration: 250, easing: Easing.inOut(Easing.linear)}),
-            withTiming(-20 + 'deg', {useNativeDriver: true, duration: 100, easing: Easing.inOut(Easing.linear)}),
-            withTiming(-0 + 'deg', {useNativeDriver: true, duration: 400, easing: Easing.inOut(Easing.linear)}),
+            withTiming(-360 + 'deg', {duration: 250, easing: Easing.inOut(Easing.linear)}),
+            withTiming(-180 + 'deg', {duration: 250, easing: Easing.inOut(Easing.linear)}),
+            withTiming(-90 + 'deg', {duration: 750, easing: Easing.inOut(Easing.linear)}),
+            withTiming(-45 + 'deg', {duration: 250, easing: Easing.inOut(Easing.linear)}),
+            withTiming(0 + 'deg', {duration: 100, easing: Easing.inOut(Easing.linear)}),
+            withTiming(20 + 'deg', {duration: 50, easing: Easing.inOut(Easing.linear)}),
+            withTiming(0 + 'deg', {duration: 250, easing: Easing.inOut(Easing.linear)}),
+            withTiming(-20 + 'deg', {duration: 100, easing: Easing.inOut(Easing.linear)}),
+            withTiming(-0 + 'deg', {duration: 400, easing: Easing.inOut(Easing.linear)}),
         ), -1)
 
     const linearAnimation = withRepeat(
         withSequence(
-            withTiming(0 + 'deg', {useNativeDriver: true, duration: 0, easing: Easing.inOut(Easing.linear)}),
-            withTiming(360 + 'deg', {useNativeDriver: true, duration: 3000, easing: Easing.inOut(Easing.linear)}),
+            withTiming(0 + 'deg', {duration: 0, easing: Easing.inOut(Easing.linear)}),
+            withTiming(360 + 'deg', {duration: 3000, easing: Easing.inOut(Easing.linear)}),
         ), -1)
 
     const zoomInAnimation = withSequence(
-        withTiming(-360 + 'deg', {useNativeDriver: true, duration: 250, easing: Easing.inOut(Easing.linear)}),
-        withTiming(-180 + 'deg', {useNativeDriver: true, duration: 250, easing: Easing.inOut(Easing.linear)}),
-        withTiming(-90 + 'deg', {useNativeDriver: true, duration: 750, easing: Easing.inOut(Easing.linear)}),
-        withTiming(-45 + 'deg', {useNativeDriver: true, duration: 250, easing: Easing.inOut(Easing.linear)}),
-        withTiming(180 + 'deg', {useNativeDriver: true, duration: 250, easing: Easing.inOut(Easing.linear)}),
+        withTiming(-360 + 'deg', {duration: 250, easing: Easing.inOut(Easing.linear)}),
+        withTiming(-180 + 'deg', {duration: 250, easing: Easing.inOut(Easing.linear)}),
+        withTiming(-90 + 'deg', {duration: 750, easing: Easing.inOut(Easing.linear)}),
+        withTiming(-45 + 'deg', {duration: 250, easing: Easing.inOut(Easing.linear)}),
+        withTiming(180 + 'deg', {duration: 250, easing: Easing.inOut(Easing.linear)}),
     )
 
     const animationStyle = useMemo<string>(() => {

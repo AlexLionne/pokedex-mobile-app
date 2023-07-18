@@ -2,12 +2,21 @@ import {SafeAreaView, View} from "react-native";
 import {ApiService} from "../services/api.service";
 import {PokeBall, PokeBallAnimations} from "../components/placeholder/PokeBall";
 import {Text} from "../components/Text/Text";
-import {useCallback, useEffect, useState} from "react";
-import {setGenerations, setPokemonsByGeneration, setPokemonsTypes} from "../redux/actions";
-import {useDispatch} from "react-redux";
+import {useCallback, useEffect, useMemo, useState} from "react";
+import {
+    setGenerations,
+    setPokemonsByGeneration,
+    setPokemonsTypes,
+    setFilterGeneration
+} from "../redux/actions";
+import {useDispatch, useSelector} from "react-redux";
 import {Pokedex} from "./Pokedex";
+import {IGenerationsStore} from "../redux/reducers/generations";
 
-const LoadingView = ({message}) => {
+interface LoadingViewProps {
+    message: string
+}
+const LoadingView = ({message}: LoadingViewProps) => {
 
     return <SafeAreaView style={{flex: 1}}>
         <View style={{flex: 1, alignItems: 'center', justifyContent: 'space-evenly'}}>
@@ -35,35 +44,65 @@ function Init() {
     const dispatch = useDispatch()
 
     const [loadingMessage, setLoadingMessage] = useState<string>('Loading pokemons types...')
-
     const [isPokedexLoaded, setIsPokedexLoaded] = useState<boolean>(false)
+
+    /* TODO
+        - we can generate an match an MD5 from server to check if pokemons / types / generations are complete
+          if not, we can download missing entities
+          we can also add an option in the settings to allow the user to download missing entities
+        - we can store our trust on pokemon generation, when a new gen is released, download pokemons and types with
+    * */
+
+    const {generations: storeGenerations}: any = useSelector<IGenerationsStore>(state => state.generations)
 
     const {data: generationsData, isLoading: loadingGeneration, error: errorGeneration} = useGenerations()
 
+    const hasNewGenerationReleased: boolean = useMemo(() => storeGenerations.length !== generationsData.length, [storeGenerations, generationsData])
+    /**
+     *
+     */
     const getAllPokemonsTypes = useCallback(async () => {
         setLoadingMessage('Loading pokemons types...')
-        const {data: pokemonsTypes} = await fetchAllPokemonTypes()
-        //
-        dispatch(setPokemonsTypes(pokemonsTypes))
-    }, [])
 
+        /*
+        * TODO
+        * hasNewGenerationReleased or hadIncompleteData
+        * -> get the diff to isolate generation(s) to fetch
+        * -> append results to pokemons store
+        * */
+
+        if (hasNewGenerationReleased) {
+            const {data: pokemonsTypes} = await fetchAllPokemonTypes()
+            //
+            dispatch(setPokemonsTypes(pokemonsTypes))
+        }
+    }, [hasNewGenerationReleased])
+
+    /**
+     *
+     */
     const getAllPokemons = useCallback(async () => {
         setLoadingMessage('Finding pokemons...')
-        const pokemons = await fetchAllPokemonsByGeneration(generationsData, (generationName: string, progress: number) => setLoadingMessage(`Catching pokemons for ${generationName}... ${progress}%`))
-        //
-        setIsPokedexLoaded(true)
-        dispatch(setPokemonsByGeneration(pokemons))
-    }, [generationsData])
+        if (hasNewGenerationReleased) {
+            const pokemons = await fetchAllPokemonsByGeneration(generationsData, (generationName: string, progress: number) => setLoadingMessage(`Catching pokemons for ${generationName}... ${progress}%`))
+            dispatch(setPokemonsByGeneration(pokemons))
+        }
+    }, [generationsData, hasNewGenerationReleased])
 
+    /**
+     *
+     */
     useEffect(() => {
         if (!!generationsData?.length && !loadingGeneration && !errorGeneration) {
             const fetchTypesAndPokemons = async () => {
                 await getAllPokemonsTypes()
                 await getAllPokemons()
             }
+            const [firstGeneration] = generationsData
             //
             dispatch(setGenerations(generationsData))
-            fetchTypesAndPokemons()
+            dispatch(setFilterGeneration(firstGeneration.name))
+            fetchTypesAndPokemons().then(() => setIsPokedexLoaded(true))
         }
     }, [loadingGeneration, generationsData])
 
@@ -73,7 +112,6 @@ function Init() {
     }
 
     return <Pokedex/>
-    //return <Text>Pokedex App</Text>
 }
 
 export default Init

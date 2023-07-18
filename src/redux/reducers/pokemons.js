@@ -4,7 +4,7 @@ import {
 } from "../constants";
 import {Pokemon} from "pokedex-promise-v2";
 
-interface IPokemonStore {
+export interface IPokemonStore {
     pokemons: Pokemon[] | []
     pokemonsTypes: string[]
 }
