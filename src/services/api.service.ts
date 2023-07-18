@@ -1,4 +1,4 @@
-import {Generation, GenerationName, Pokemon} from "pokedex-promise-v2";
+import {Generation, GenerationName, Pokemon, PokemonType} from "pokedex-promise-v2";
 import {useQuery} from "react-query";
 import {
     DEFAULT_LANGUAGE,
@@ -8,7 +8,6 @@ import {
     FETCH_POKEMONS_TYPES
 } from "../constants/constants";
 import axios from "axios";
-import generations from "../redux/reducers/generations";
 
 
 const ApiService = (): any => {
@@ -34,9 +33,16 @@ const ApiService = (): any => {
         return []
     }
 
-    async function fetchAllPokemonsTypes(): Promise<Pokemon[]> {
+    async function fetchAllPokemonTypes(): Promise<PokemonType[]> {
         try {
-
+            const {data} = await axios.get(`${baseUrl}/pokemons/types`,
+                {
+                    headers: {
+                        "Content-Type": 'application/json'
+                    }
+                }
+            );
+            return data as PokemonType[]
         } catch (e) {
 
         }
@@ -69,7 +75,7 @@ const ApiService = (): any => {
 
             // fetch next page of generation
             const {data: {next: nextPage, results: newPokemons}} = await fetchAllPokemonsByGenerationPage(generation, next, updateProgress)
-            const pokemonFetched = [...pokemons, ...newPokemons]
+            const pokemonFetched = [...pokemons, ...newPokemons].sort((pA, pB) => pA.id - pB.id)
 
             // late progress
             updateProgress(generationName, parseInt((pokemonFetched.length / totalGenerationPokemons * 100).toFixed(0)))
@@ -95,7 +101,7 @@ const ApiService = (): any => {
                 const {data: {results: allPokemons}} = await fetchAllPokemonsByGenerationPage(generation, 0, updateProgress)
                 pokemons = [...pokemons, ...allPokemons]
             }
-            console.log(pokemons.length)
+            return pokemons
         } catch (e) {
             console.error(e)
             return []
@@ -110,7 +116,7 @@ const ApiService = (): any => {
         // requests
         fetchAllPokemonsByGeneration,
         fetchAllGenerations,
-        fetchAllPokemonsTypes,
+        fetchAllPokemonTypes,
         // react-query
         useGenerations,
         usePokemonsTypes

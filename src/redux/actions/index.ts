@@ -14,8 +14,8 @@ export const setPokemonsByGeneration = (pokemons: Pokemon[]) => ({
   pokemons
 })
 
-export const setPokemonsTypes = (types: PokemonType[]) => ({
+export const setPokemonsTypes = (pokemonsTypes: PokemonType[]) => ({
   type: SET_POKEMON_TYPES,
-  types
+  pokemonsTypes
 })
 

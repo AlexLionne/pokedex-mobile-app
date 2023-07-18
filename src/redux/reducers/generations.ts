@@ -3,7 +3,7 @@ import {
 } from "../constants";
 import {Generation} from "pokedex-promise-v2";
 
-interface IGenerationsStore {
+export interface IGenerationsStore {
     generations: Generation[] | []
 }
 

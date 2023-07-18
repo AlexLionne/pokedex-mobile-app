@@ -26,55 +26,55 @@ export default {
     },
     pokemonTypes: {
         fire: {
-            color: '#EE8130'
+            color: '#FB6C6C'
         },
         grass: {
-            color: '#7AC74C'
+            color: '#46D0A7'
         },
         water: {
-            color: '#6390F0'
+            color: '#77BDFE'
         },
         electric: {
-            color: '#F7D02C'
+            color: '#FFCE4B'
         },
         normal: {
-            color: '#A8A77A'
+            color: '#ABAA71'
         },
         poison: {
-            color: '#A33EA1'
+            color: '#E488E3'
         },
         ice: {
             color: '#96D9D6'
         },
         fighting: {
-            color: '#C22E28'
+            color: '#CE6F6B'
         },
         ground: {
-            color: '#E2BF65'
+            color: '#F3D484'
         },
         flying: {
             color: '#A98FF3'
         },
         psychic: {
-            color: '#F95587'
+            color: '#F5789E'
         },
         bug: {
-            color: '#A6B91A'
+            color: '#BCCA53'
         },
         rock: {
-            color: '#B6A136'
+            color: '#CEBC62'
         },
         ghost: {
-            color: '#735797'
+            color: '#9476BA'
         },
         dark: {
-            color: '#705746'
+            color: '#956B4F'
         },
         dragon: {
-            color: '#6F35FC'
+            color: '#7A59CA'
         },
         fairy: {
-            color: '#D685AD'
+            color: '#E5A2C3'
         },
         steel: {
             color: '#B7B7CE'

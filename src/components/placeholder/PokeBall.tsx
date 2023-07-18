@@ -2,16 +2,18 @@ import React, {JSX, useEffect, useMemo} from "react";
 import {SVGPokeBall} from '../../assets/Pokeball'
 import Animated, {
     Easing,
+    interpolate,
     useAnimatedStyle,
     useSharedValue,
     withRepeat,
     withSequence,
-    withTiming
+    withTiming,
 } from "react-native-reanimated";
 
 export enum PokeBallAnimations {
     CATCH = 'CATCH',
-    LINEAR = 'LINEAR'
+    LINEAR = 'LINEAR',
+    ZOOM_IN = 'ZOOM_IN'
 }
 
 interface IPokeBall {
@@ -21,15 +23,25 @@ interface IPokeBall {
     height: number
 }
 
-const PokeBall = React.memo(({animated, width, height, animation}: IPokeBall): JSX.Element => {
+/*
+* TODO handle exit animation that is currently not working with RNReanimated ...
+* https://github.com/software-mansion/react-native-reanimated/issues/4108
+* https://github.com/software-mansion/react-native-reanimated/issues/4534
+*
+* */
+const PokeBall = ({animated, width, height, animation}: IPokeBall): JSX.Element => {
 
     const offset = useSharedValue<any>(0);
 
     const animatedStyles = useAnimatedStyle((): {} => {
         return {
-            transform: [{rotateZ: `${offset.value}deg`}],
+            transform: [
+                {rotateZ: `${offset.value}deg`},
+                {scale: animation === PokeBallAnimations.ZOOM_IN ? interpolate(parseInt(offset.value), [0, -360, -180, -45, 180], [1, 1, 1, 1, 20]) : 1}
+            ],
         };
     }, [offset.value]);
+
 
     const pokeballAnimation = withRepeat(
         withSequence(
@@ -50,9 +62,18 @@ const PokeBall = React.memo(({animated, width, height, animation}: IPokeBall): J
             withTiming(360 + 'deg', {useNativeDriver: true, duration: 3000, easing: Easing.inOut(Easing.linear)}),
         ), -1)
 
+    const zoomInAnimation = withSequence(
+        withTiming(-360 + 'deg', {useNativeDriver: true, duration: 250, easing: Easing.inOut(Easing.linear)}),
+        withTiming(-180 + 'deg', {useNativeDriver: true, duration: 250, easing: Easing.inOut(Easing.linear)}),
+        withTiming(-90 + 'deg', {useNativeDriver: true, duration: 750, easing: Easing.inOut(Easing.linear)}),
+        withTiming(-45 + 'deg', {useNativeDriver: true, duration: 250, easing: Easing.inOut(Easing.linear)}),
+        withTiming(180 + 'deg', {useNativeDriver: true, duration: 250, easing: Easing.inOut(Easing.linear)}),
+    )
+
     const animationStyle = useMemo<string>(() => {
         if (animation === PokeBallAnimations.CATCH) return pokeballAnimation
         if (animation === PokeBallAnimations.LINEAR) return linearAnimation
+        if (animation === PokeBallAnimations.ZOOM_IN) return zoomInAnimation
 
         return linearAnimation
     }, [animation])
@@ -64,9 +85,9 @@ const PokeBall = React.memo(({animated, width, height, animation}: IPokeBall): J
     }, [animated, animationStyle])
 
     return <Animated.View style={[animatedStyles]}>
-        <SVGPokeBall color={'#303943'} opacity={0.05} width={width} height={height}/>
+        <SVGPokeBall color={'#F4F5F4'} opacity={1} width={width} height={height}/>
     </Animated.View>
-}, (p, n) => p.animated === n.animated)
+}
 
 
 export {PokeBall}
