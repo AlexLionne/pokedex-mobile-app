@@ -1,15 +1,16 @@
 import React, {JSX, useMemo} from "react";
 import {useSelector} from "react-redux";
-import {FlatList} from "react-native";
 import {PokemonCard} from "../cards/PokemonCard";
 import {DEFAULT_POKEMONS_COLUMNS} from "../../constants/constants";
-
+import {FlatList} from 'react-native'
 import {IApplicationReducerStore} from "../../redux/reducers/application";
 import {IPokemonReducerStore} from "../../redux/reducers/pokemons";
 import {Generation, Pokemon, PokemonSpecies} from "pokedex-promise-v2";
 import {IGenerationsReducerStore} from "../../redux/reducers/generations";
 
-const PokedexList = React.memo((): JSX.Element => {
+interface IPokedexList {}
+
+const PokedexList = React.memo(({}: IPokedexList): JSX.Element => {
 
     const {generations}: any = useSelector((state: IGenerationsReducerStore) => state.generations)
     const {pokemons}: any = useSelector((state: IPokemonReducerStore) => state.pokemons)
@@ -24,9 +25,11 @@ const PokedexList = React.memo((): JSX.Element => {
     }), [pokemons, selectedGeneration])
 
     return <FlatList
-        contentContainerStyle={{padding: 24}}
+        contentContainerStyle={{paddingHorizontal: 24}}
         scrollEventThrottle={32} numColumns={DEFAULT_POKEMONS_COLUMNS} data={filteredPokemons}
-        renderItem={({item: pokemon, index}) => <PokemonCard index={index} pokemon={pokemon}/>}/>
-}, (p, n) => true)
+        renderItem={({item: pokemon, index}) => <PokemonCard index={index} pokemon={pokemon}
+                                                             totalPokemons={filteredPokemons.length}/>}
+    />
+}, (p, n) => false)
 
 export {PokedexList}

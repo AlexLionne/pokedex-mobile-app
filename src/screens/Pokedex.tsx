@@ -1,15 +1,29 @@
-
-import {SafeAreaView, View} from "react-native";
+import {View} from "react-native";
 import {PokedexList} from "../components/lists/PokedexList";
-import {Text} from "../components/Text/Text";
+import {Header} from "../components/header/Header";
+import {ListBulletIcon} from 'react-native-heroicons/solid'
+
 
 function Pokedex() {
-    return <SafeAreaView style={{backgroundColor: 'white', flex: 1}}>
-        <View style={{ flex: 1}}>
-            <Text size={30} style={{marginLeft: 24}} bold>Pokedex</Text>
-            <PokedexList/>
+
+    return <View style={{backgroundColor: 'white', flex: 1, paddingTop: 48}}>
+        <View style={{flex: 1}}>
+            <Header
+                title={'Pokedex'}
+                actions={[
+                    {
+                        position: 'right',
+                        onPress: () => {},
+                        icon: (props) => <ListBulletIcon {...props}/>
+                    }
+                ]}
+            />
+            <View style={{flex: 1, marginTop: -32}}>
+                <PokedexList/>
+            </View>
+
         </View>
-    </SafeAreaView>
+    </View>
 }
 
 
