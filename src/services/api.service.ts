@@ -107,9 +107,7 @@ const ApiService = (): any => {
     }
 
 
-    const useGenerations = () => {
-        useQuery([FETCH_ALL_GENERATIONS_KEY], fetchAllGenerations);
-    }
+    const useGenerations = () => useQuery([FETCH_ALL_GENERATIONS_KEY], fetchAllGenerations);
 
     return {
         // requests

@@ -57,7 +57,7 @@ function Init() {
 
     const {data: generationsData, isLoading: loadingGeneration, error: errorGeneration} = useGenerations()
 
-    const hasNewGenerationReleased: boolean = useMemo(() => storeGenerations.length !== generationsData.length, [storeGenerations, generationsData])
+    const hasNewGenerationReleased: boolean = useMemo(() => storeGenerations?.length !== generationsData?.length, [storeGenerations, generationsData])
     /**
      *
      */
