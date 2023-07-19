@@ -7,6 +7,7 @@ import {IApplicationReducerStore} from "../../redux/reducers/application";
 import {IPokemonReducerStore} from "../../redux/reducers/pokemons";
 import {Generation, Pokemon, PokemonSpecies} from "pokedex-promise-v2";
 import {IGenerationsReducerStore} from "../../redux/reducers/generations";
+import {ISelectionReducerStore, ISelectionStore} from "../../redux/reducers/selection";
 
 interface IPokedexList {}
 
@@ -14,13 +15,13 @@ const PokedexList = React.memo(({}: IPokedexList): JSX.Element => {
 
     const {generations}: any = useSelector((state: IGenerationsReducerStore) => state.generations)
     const {pokemons}: any = useSelector((state: IPokemonReducerStore) => state.pokemons)
-    const {filterPokemonsGeneration}: any = useSelector((state: IApplicationReducerStore) => state.application)
+    const {filterPokemonsGeneration}: any = useSelector((state: ISelectionReducerStore) => state.selection)
 
     const selectedGeneration = useMemo(() => {
         return generations.find((generation: Generation) => generation.name === filterPokemonsGeneration)
     }, [generations, filterPokemonsGeneration])
 
-    const filteredPokemons = useMemo<Pokemon[]>(() => pokemons.filter((pokemon: Pokemon) => {
+    const filteredPokemons = useMemo<Pokemon[]>(() => pokemons?.filter((pokemon: Pokemon) => {
         return selectedGeneration?.pokemon_species?.some((pokemonSpecie: PokemonSpecies) => pokemonSpecie.name === pokemon.name)
     }), [pokemons, selectedGeneration])
 

@@ -4,6 +4,7 @@ import {Provider} from 'react-redux'
 import Init from "./src/screens/Init";
 import {persistStore} from 'redux-persist'
 import {QueryClient, QueryClientProvider} from 'react-query'
+import {GestureHandlerRootView} from "react-native-gesture-handler";
 
 function App() {
     const queryClient = new QueryClient()
@@ -14,7 +15,9 @@ function App() {
     return <Provider store={store}>
         <QueryClientProvider client={queryClient}>
             <PersistGate loading={null} persistor={persistor}>
-                <Init/>
+                <GestureHandlerRootView style={{flex: 1}}>
+                    <Init/>
+                </GestureHandlerRootView>
             </PersistGate>
         </QueryClientProvider>
     </Provider>
