@@ -4,14 +4,15 @@ import {Text} from "../Text/Text";
 import {useWindowDimensions, View} from "react-native";
 import FastImage from "react-native-fast-image";
 import colors from "../../colors/colors";
-import {EPokeBallAnimations, PokeBall} from "../placeholder/PokeBall";
+import {PokeBall} from "../placeholder/PokeBall";
 
 interface IPokemonCard {
     index: number
     pokemon: Pokemon
+    totalPokemons: number
 }
 
-const PokemonCard = React.memo(({pokemon, index}: IPokemonCard): JSX.Element => {
+const PokemonCard = React.memo(({pokemon, index, totalPokemons}: IPokemonCard): JSX.Element => {
     const {width} = useWindowDimensions()
 
     const pokemonName = useMemo(() => pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1, pokemon.name.length), [pokemon.name])
@@ -27,6 +28,13 @@ const PokemonCard = React.memo(({pokemon, index}: IPokemonCard): JSX.Element => 
         return pokemon.sprites.other["official-artwork"]?.front_default
     }, [pokemon])
 
+    const pokemonId = useMemo(() => {
+        const digitsToAppend = Array(Array(totalPokemons.toString().length).fill('0').length - pokemon.id.toString().length)
+        // first gen =
+        // [0,0,0] + id=1 = 2 : '00' + pokemon.id
+        return (digitsToAppend.fill('0') + pokemon.id.toString()).replaceAll(',', '')
+    }, [pokemon, totalPokemons])
+
     return <View style={{
         overflow: 'hidden',
         backgroundColor: backgroundColor,
@@ -34,12 +42,13 @@ const PokemonCard = React.memo(({pokemon, index}: IPokemonCard): JSX.Element => 
         marginRight: index % 2 ? 0 : 12,
         width: (width / 2) - 30,
         borderRadius: 15,
-        padding: 12,
-        height: 140,
+        paddingHorizontal: 14,
+        paddingVertical: 8,
+        height: 120,
         position: 'relative',
     }}>
         <View style={{flex: 0, flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'flex-end'}}>
-            <Text size={15}>{`#${pokemon.id}`}</Text>
+            <Text size={14} color={'rgba(0,0,0,.5)'} bold>{`#${pokemonId}`}</Text>
         </View>
         <View style={{
             flex: 0,
@@ -48,32 +57,42 @@ const PokemonCard = React.memo(({pokemon, index}: IPokemonCard): JSX.Element => 
             justifyContent: 'flex-start',
         }}>
             <View>
-                <Text size={17} color={'white'} style={{marginBottom: 8}}>{pokemonName}</Text>
+                <Text size={15} color={'white'} style={{marginBottom: 8}}>{pokemonName}</Text>
                 <View>
-                {pokemon.types.map(({type}, index) => {
-                    return <View key={`${pokemon.name}-${index}-type`} style={{
-                        alignSelf: 'flex-start',
-                        backgroundColor: 'rgba(255,255,255,.2)',
-                        paddingHorizontal: 12,
-                        paddingVertical: 6,
-                        borderRadius: 22,
-                        marginBottom: 8
-                    }}>
-                        <Text color={'white'}>{type.name}</Text>
-                    </View>
-                })}
+                    {pokemon.types.map(({type}, index) => {
+                        const typeName = type.name.charAt(0).toUpperCase() + type.name.slice(1, type.name.length)
+                        return <View key={`${pokemon.name}-${index}-type`}
+                                     style={{
+                                         alignSelf: 'flex-start',
+                                         backgroundColor: 'rgba(255,255,255,.2)',
+                                         paddingHorizontal: 12,
+                                         paddingVertical: 4,
+                                         borderRadius: 22,
+                                         marginBottom: 8
+                                     }}>
+                            <Text color={'white'} size={10}>{typeName}</Text>
+                        </View>
+                    })}
                 </View>
             </View>
 
 
         </View>
 
-        <View style={{position: 'absolute', width: 90, right: -10, bottom: -10, zIndex: 999, alignItems: 'center', justifyContent: 'center'}}>
-            <PokeBall animated={false} width={100} height={100} color={'rgba(255,255,255,.2)'} rotation={0}/>
+        <View style={{
+            position: 'absolute',
+            width: 90,
+            right: -10,
+            bottom: -10,
+            zIndex: 999,
+            alignItems: 'center',
+            justifyContent: 'center'
+        }}>
+            <PokeBall animated={false} width={90} height={90} color={'rgba(255,255,255,.2)'} rotation={0}/>
         </View>
         <View style={{position: 'absolute', width: 90, right: 0, bottom: 0, zIndex: 999}}>
             <FastImage
-                style={{width: 90, height: 90}}
+                style={{width: 90, height: 80}}
                 source={{
                     uri: pokemonPreview as string,
                     priority: FastImage.priority.normal,
