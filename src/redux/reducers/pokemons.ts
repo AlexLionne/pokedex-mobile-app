@@ -1,6 +1,6 @@
 import {
     SET_POKEMON_BY_GENERATIONS,
-    SET_POKEMON_TYPES
+    SET_POKEMON_TYPES, SET_SELECTED_POKEMON
 } from "../constants";
 import {Pokemon} from "pokedex-promise-v2";
 

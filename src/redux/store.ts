@@ -1,6 +1,7 @@
 import applicationReducer from './reducers/application'
 import pokemonsReducer from './reducers/pokemons'
 import generationReducer from './reducers/generations'
+import selectionReducer from './reducers/selection'
 import {combineReducers} from 'redux'
 import {persistReducer} from 'redux-persist'
 import FilesystemStorage from 'redux-persist-filesystem-storage'
@@ -10,7 +11,7 @@ import { configureStore } from '@reduxjs/toolkit'
 
 const rootReducer = combineReducers(
     {
-        application: applicationReducer,
+        selection: selectionReducer,
         pokemons: pokemonsReducer,
         generations: generationReducer,
     },
@@ -19,8 +20,8 @@ const rootReducer = combineReducers(
 const persistConfig = {
     key: 'root',
     storage: FilesystemStorage,
-    whitelist: ['application', 'generations', 'pokemons'],
-    blacklist: [],
+    whitelist: ['generations', 'pokemons'],
+    blacklist: ['selection'],
     timeout: null,
 }
 
