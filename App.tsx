@@ -1,18 +1,23 @@
-import {store, persistor} from './src/redux/store';
-import { PersistGate } from 'redux-persist/integration/react'
-import { Provider } from 'react-redux'
-import {AppRegistry} from "react-native";
+import store from './src/redux/store';
+import {PersistGate} from 'redux-persist/integration/react'
+import {Provider} from 'react-redux'
 import Init from "./src/screens/Init";
+import {persistStore} from 'redux-persist'
+import {QueryClient, QueryClientProvider} from 'react-query'
 
 function App() {
-  return <Provider store={store}>
-    <PersistGate loading={null} persistor={persistor}>
-      <Init/>
-    </PersistGate>
-  </Provider>
+    const queryClient = new QueryClient()
+
+    const persistor = persistStore(store)
+
+
+    return <Provider store={store}>
+        <QueryClientProvider client={queryClient}>
+            <PersistGate loading={null} persistor={persistor}>
+                <Init/>
+            </PersistGate>
+        </QueryClientProvider>
+    </Provider>
 }
 
-
-
-
-AppRegistry.registerComponent('root', () => App)
+export default App

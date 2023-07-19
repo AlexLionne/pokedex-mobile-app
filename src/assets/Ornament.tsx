@@ -9,14 +9,17 @@ interface IOrnament {
 export const Ornament = ({
                              width = 109,
                              height = 110,
-                             gradient = [{stopColor: '#48D0B0', stopOpacity: 1}, {
-                                 offset: 0.796391,
-                                 stopColor: '#48D0B0',
-                                 stopOpacity: 0
-                             }]
+                             gradient = [
+                                 {
+                                     stopColor: '#48D0B0', stopOpacity: 1, offset: 0
+                                 },
+                                 {
+                                     offset: 0.796391,
+                                     stopColor: '#48D0B0',
+                                     stopOpacity: 0
+                                 }]
                          }: IOrnament) => {
-    return <Svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} fill="none"
-                xmlns="http://www.w3.org/2000/svg">
+    return <Svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} fill="none">
         <G style="mix-blend-mode:screen" opacity="0.3">
             <Rect x="77.0197" y="-61" width="143.924" height="143.924" rx="24" transform="rotate(75 77.0197 -61)"
                   fill="url(#paint0_linear_0_6)"/>
