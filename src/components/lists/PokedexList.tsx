@@ -4,21 +4,29 @@ import {FlatList} from "react-native";
 import {PokemonCard} from "../cards/PokemonCard";
 import {DEFAULT_POKEMONS_COLUMNS} from "../../constants/constants";
 
-import {IApplicationStore} from "../../redux/reducers/application";
-import {IPokemonStore} from "../../redux/reducers/pokemons";
-import {Pokemon} from "pokedex-promise-v2";
-interface IPokedexList{}
+import {IApplicationReducerStore} from "../../redux/reducers/application";
+import {IPokemonReducerStore} from "../../redux/reducers/pokemons";
+import {Generation, Pokemon, PokemonSpecies} from "pokedex-promise-v2";
+import {IGenerationsReducerStore} from "../../redux/reducers/generations";
 
-const PokedexList = React.memo(({}: any ): JSX.Element => {
+const PokedexList = React.memo((): JSX.Element => {
 
-    const {pokemons}: any = useSelector<IPokemonStore>(state => state.pokemons)
-    const {filterPokemonsGeneration}: any = useSelector<IApplicationStore>(state => state)
+    const {generations}: any = useSelector((state: IGenerationsReducerStore) => state.generations)
+    const {pokemons}: any = useSelector((state: IPokemonReducerStore) => state.pokemons)
+    const {filterPokemonsGeneration}: any = useSelector((state: IApplicationReducerStore) => state.application)
 
-    const filteredPokemons = useMemo<Pokemon[]>(() => pokemons.filter((pokemon: Pokemon) => Object.keys(pokemon.sprites.versions).includes(filterPokemonsGeneration)), [pokemons, filterPokemonsGeneration])
+    const selectedGeneration = useMemo(() => {
+        return generations.find((generation: Generation) => generation.name === filterPokemonsGeneration)
+    }, [generations, filterPokemonsGeneration])
+
+    const filteredPokemons = useMemo<Pokemon[]>(() => pokemons.filter((pokemon: Pokemon) => {
+        return selectedGeneration?.pokemon_species?.some((pokemonSpecie: PokemonSpecies) => pokemonSpecie.name === pokemon.name)
+    }), [pokemons, selectedGeneration])
 
     return <FlatList
         contentContainerStyle={{padding: 24}}
-        scrollEventThrottle={32} numColumns={DEFAULT_POKEMONS_COLUMNS} data={filteredPokemons} renderItem={({item: pokemon, index}) => <PokemonCard index={index} pokemon={pokemon}/>}/>
+        scrollEventThrottle={32} numColumns={DEFAULT_POKEMONS_COLUMNS} data={filteredPokemons}
+        renderItem={({item: pokemon, index}) => <PokemonCard index={index} pokemon={pokemon}/>}/>
 }, (p, n) => true)
 
 export {PokedexList}

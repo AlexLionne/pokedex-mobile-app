@@ -3,6 +3,9 @@ import {
 } from "../constants";
 import {Generation} from "pokedex-promise-v2";
 
+export interface IGenerationsReducerStore {
+    generations: IGenerationsStore
+}
 export interface IGenerationsStore {
     generations: Generation[] | []
 }
@@ -15,7 +18,7 @@ const generationReducer = (state: IGenerationsStore = initialState, action: any)
         case SET_GENERATIONS:
             return {
                 ...state,
-                generation: action.generation
+                generations: action.generations
             }
         default:
             return state;

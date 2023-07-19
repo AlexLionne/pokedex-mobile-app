@@ -10,17 +10,19 @@ import Animated, {
     withTiming,
 } from "react-native-reanimated";
 
-export enum PokeBallAnimations {
+export enum EPokeBallAnimations {
     CATCH = 'CATCH',
     LINEAR = 'LINEAR',
     ZOOM_IN = 'ZOOM_IN'
 }
 
 interface IPokeBall {
-    animation: PokeBallAnimations
+    animation?: EPokeBallAnimations
+    rotation?: number
     animated: boolean
     width: number
     height: number
+    color: string
 }
 
 /*
@@ -29,15 +31,15 @@ interface IPokeBall {
 * https://github.com/software-mansion/react-native-reanimated/issues/4534
 *
 * */
-const PokeBall = ({animated, width, height, animation}: IPokeBall): JSX.Element => {
+const PokeBall = ({animated, width, height, animation, color, rotation}: IPokeBall): JSX.Element => {
 
-    const offset = useSharedValue<any>(0);
+    const offset = useSharedValue<any>(animated ? 0 : rotation);
 
     const animatedStyles = useAnimatedStyle((): {} => {
         return {
             transform: [
                 {rotateZ: `${offset.value}deg`},
-                {scale: animation === PokeBallAnimations.ZOOM_IN ? interpolate(parseInt(offset.value), [0, -360, -180, -45, 180], [1, 1, 1, 1, 20]) : 1}
+                {scale: animation === EPokeBallAnimations.ZOOM_IN ? interpolate(parseInt(offset.value), [0, -360, -180, -45, 180], [1, 1, 1, 1, 20]) : 1}
             ],
         };
     }, [offset.value]);
@@ -71,9 +73,9 @@ const PokeBall = ({animated, width, height, animation}: IPokeBall): JSX.Element 
     )
 
     const animationStyle = useMemo<string>(() => {
-        if (animation === PokeBallAnimations.CATCH) return pokeballAnimation
-        if (animation === PokeBallAnimations.LINEAR) return linearAnimation
-        if (animation === PokeBallAnimations.ZOOM_IN) return zoomInAnimation
+        if (animation === EPokeBallAnimations.CATCH) return pokeballAnimation
+        if (animation === EPokeBallAnimations.LINEAR) return linearAnimation
+        if (animation === EPokeBallAnimations.ZOOM_IN) return zoomInAnimation
 
         return linearAnimation
     }, [animation])
@@ -85,7 +87,7 @@ const PokeBall = ({animated, width, height, animation}: IPokeBall): JSX.Element 
     }, [animated, animationStyle])
 
     return <Animated.View style={[animatedStyles]}>
-        <SVGPokeBall color={'#F4F5F4'} opacity={1} width={width} height={height}/>
+        <SVGPokeBall color={color} opacity={1} width={width} height={height}/>
     </Animated.View>
 }
 

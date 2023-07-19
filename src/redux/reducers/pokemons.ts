@@ -4,6 +4,9 @@ import {
 } from "../constants";
 import {Pokemon} from "pokedex-promise-v2";
 
+export interface IPokemonReducerStore {
+    pokemons: IPokemonStore
+}
 export interface IPokemonStore {
     pokemons: Pokemon[] | []
     pokemonsTypes: string[]

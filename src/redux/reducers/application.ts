@@ -1,6 +1,9 @@
 import {DEFAULT_POKEMON_FILTER_TYPE, DEFAULT_POKEMON_GENERATION} from "../../constants/constants";
 import {SET_FILTER_POKEMON_GENERATION, SET_FILTER_POKEMON_TYPES} from "../constants";
 
+export interface IApplicationReducerStore {
+    application: IApplicationStore
+}
 export interface IApplicationStore {
     filterPokemonsType: string /* won't do an enum if new types are release */
     filterPokemonsGeneration: string /* won't do an enum if new generations are release */

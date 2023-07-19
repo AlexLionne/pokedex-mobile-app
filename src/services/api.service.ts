@@ -54,7 +54,7 @@ const ApiService = (): any => {
      */
     async function fetchAllPokemonsByGenerationPage(generation: Generation, page: number = 0, updateProgress: Function): Promise<{data: {next: number, results: Pokemon[]}}>  {
         const totalGenerationPokemons = generation.pokemon_species.length
-
+        
         // @ts-ignore
         let generationName: string  = generation.names.find((generationName: GenerationName) => generationName.language.name as string === DEFAULT_LANGUAGE).name || generation.name
 

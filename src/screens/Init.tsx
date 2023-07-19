@@ -1,6 +1,6 @@
 import {SafeAreaView, View} from "react-native";
 import {ApiService} from "../services/api.service";
-import {PokeBall, PokeBallAnimations} from "../components/placeholder/PokeBall";
+import {PokeBall, EPokeBallAnimations} from "../components/placeholder/PokeBall";
 import {Text} from "../components/Text/Text";
 import {useCallback, useEffect, useMemo, useState} from "react";
 import {
@@ -23,7 +23,8 @@ const LoadingView = ({message}: LoadingViewProps) => {
             <Text size={25} style={{zIndex: 1}}>Pokedex App</Text>
             <View style={{flex: 0, alignItems: 'center', justifyContent: 'center', zIndex: 2}}>
                 <PokeBall animated={true} height={183} width={183}
-                          animation={PokeBallAnimations.CATCH}
+                          animation={EPokeBallAnimations.CATCH}
+                          color={"#F4F5F4"}
                 />
             </View>
             <View style={{alignItems: 'center', zIndex: 1}}>
