@@ -16,7 +16,7 @@ function Pokedex() {
         <View style={{backgroundColor: 'white', flex: 1, paddingTop: 48}}>
             <View style={{flex: 1}}>
                 <Header
-                    title={'Pokedex'}
+                    title={'Pokédex'}
                     actions={[
                         {
                             position: 'right',

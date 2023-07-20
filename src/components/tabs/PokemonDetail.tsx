@@ -42,7 +42,7 @@ const PokemonDetail = ({}: IPokemonDetail): JSX.Element => {
             containerStyle={{zIndex: 4}}
             enablePanDownToClose
             ref={bottomSheetRef}
-            index={1}
+            index={-1}
             snapPoints={snapPoints}
             onChange={handleSheetChanges}
         >

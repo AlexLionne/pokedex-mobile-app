@@ -10,6 +10,8 @@ import {useDispatch, useSelector} from "react-redux";
 import Animated, {Easing, FadeIn, FadeOut, useAnimatedStyle, useSharedValue, withTiming} from "react-native-reanimated";
 import {Portal} from "@gorhom/portal";
 import {ISelectionReducerStore} from "../../redux/reducers/selection";
+import {IPokemonReducerStore} from "../../redux/reducers/pokemons";
+import {DEFAULT_LANGUAGE} from "../../constants/constants";
 
 
 interface IPokemonCard {
@@ -22,13 +24,24 @@ const PokemonCard = React.memo(({pokemon, index, totalPokemons}: IPokemonCard): 
     const {width, height} = useWindowDimensions()
     const dispatch = useDispatch()
 
-    const pokemonName = useMemo(() => pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1, pokemon.name.length), [pokemon.name])
     const {selectedPokemon} = useSelector((state: ISelectionReducerStore) => state.selection)
+    const {
+        pokemonsNames,
+        pokemonsTypes: storePokemonTypes
+    } = useSelector((state: IPokemonReducerStore) => state.pokemons)
+
     // track positions for animations
     const [elementPosition, setElementPosition] = useState<any>(null)
 
+    const translations = useMemo(() => pokemonsNames.find((name: any) => {
+        const [pokemonKey] = Object.keys(name)
+        return pokemonKey === pokemon.name
+    }), [pokemonsNames, pokemon.name])
+
+    const pokemonName = useMemo(() => translations[pokemon.name][DEFAULT_LANGUAGE], [translations, pokemon.name])
+
     const backgroundColor = useMemo(() => {
-        const [pokemonType]: PokemonType[] = pokemon.types
+        const [pokemonType]: PokemonType[] = pokemon.types.sort((primaryType: PokemonType, secondaryType: PokemonType): any => (primaryType.slot > secondaryType.slot))
         // @ts-ignore
         return colors.pokemonTypes[pokemonType.type.name].color
     }, [pokemon])
@@ -37,6 +50,19 @@ const PokemonCard = React.memo(({pokemon, index, totalPokemons}: IPokemonCard): 
         // @ts-ignore - index by official artwork
         return pokemon.sprites.other["official-artwork"]?.front_default
     }, [pokemon])
+
+    const pokemonTypes = useMemo<any[]>((): any => {
+        let pokemonFullTypes = storePokemonTypes.filter((type: any) => pokemon.types.map((pokemonType: PokemonType) => pokemonType.type.name).includes(type.name))
+        return pokemonFullTypes.map((pokemonFullType: any) => {
+
+            const [translatedType] = pokemonFullType.names.filter((name: Array<{ language: string, type: string }>) => {
+                const [languageKey] = Object.keys(name)
+                return languageKey === DEFAULT_LANGUAGE
+            })
+            return ({slot: pokemon.types.find(type => type.type.name === pokemonFullType.name)?.slot, name: translatedType[DEFAULT_LANGUAGE]})
+        }).sort((primaryType: any, secondaryType: any): any => (primaryType.slot > secondaryType.slot))
+    }, [pokemon, storePokemonTypes])
+
 
     const pokemonId = useMemo(() => {
         const digitsToAppend = Array(Array(totalPokemons.toString().length).fill('0').length - pokemon.id.toString().length)
@@ -56,8 +82,7 @@ const PokemonCard = React.memo(({pokemon, index, totalPokemons}: IPokemonCard): 
 
         dispatch(setSelectedPokemon(pokemon))
     }, [pokemon])
-
-
+    
     const PokemonAssetDetailed = () => {
         if (!(selectedPokemon && selectedPokemon.name === pokemon.name && elementPosition)) return null
 
@@ -87,8 +112,63 @@ const PokemonCard = React.memo(({pokemon, index, totalPokemons}: IPokemonCard): 
 //
         useEffect(() => {
             scaleAnimation.value = withTiming(3, {duration: 750, easing: Easing.inOut(Easing.linear)})
-            translateX.value = withTiming(targetX - (80/2), {duration: 750, easing: Easing.inOut(Easing.linear)})
-            translateY.value = withTiming(targetY + (80 * 2) + 50  , {duration: 750, easing: Easing.inOut(Easing.linear)})
+            translateX.value = withTiming(targetX - (80 / 2), {duration: 750, easing: Easing.inOut(Easing.linear)})
+            translateY.value = withTiming(targetY + (80 * 2) + 50, {duration: 750, easing: Easing.inOut(Easing.linear)})
+        }, [])
+
+        return <Portal hostName={"PokemonDetailBackgroundHost"}>
+            <Animated.View
+                style={[{
+                    position: 'absolute',
+                    left: elementPosition.asset.pageX,
+                    top: elementPosition.asset.pageY,
+                    width: 90,
+                    right: 0,
+                    bottom: 0,
+                    zIndex: 5
+                }, animatedStyles]}>
+                <FastImage
+                    style={{width: 90, height: 80}}
+                    source={{
+                        uri: pokemonPreview as string,
+                        priority: FastImage.priority.normal,
+                    }}
+                    resizeMode={FastImage.resizeMode.contain}
+                />
+            </Animated.View>
+        </Portal>
+    }
+    const PokemonStatsDetailed = () => {
+        if (!(selectedPokemon && selectedPokemon.name === pokemon.name && elementPosition)) return null
+
+        const {pageX, pageY} = elementPosition['asset']
+
+        const targetPosition = [width / 2, height / 3 + 50]
+        const [targetX, targetY] = targetPosition
+
+
+        const scaleAnimation = useSharedValue<any>(1);
+        const translateX = useSharedValue<any>(pageX);
+        const translateY = useSharedValue<any>(pageY);
+
+        const animatedStyles = useAnimatedStyle((): {} => {
+            // enter
+            return {
+                top: translateY.value,
+                left: translateX.value,
+                transform: [
+                    //{translateX: translateX.value},
+                    //{translateY: translateY.value},
+                    {scale: scaleAnimation.value}
+                ],
+            };
+
+        }, [targetX, targetY]);
+//
+        useEffect(() => {
+            scaleAnimation.value = withTiming(3, {duration: 750, easing: Easing.inOut(Easing.linear)})
+            translateX.value = withTiming(targetX - (80 / 2), {duration: 750, easing: Easing.inOut(Easing.linear)})
+            translateY.value = withTiming(targetY + (80 * 2) + 50, {duration: 750, easing: Easing.inOut(Easing.linear)})
         }, [])
 
         return <Portal hostName={"PokemonDetailBackgroundHost"}>
@@ -141,8 +221,7 @@ const PokemonCard = React.memo(({pokemon, index, totalPokemons}: IPokemonCard): 
                 <View>
                     <Text size={15} color={'white'} style={{marginBottom: 8}}>{pokemonName}</Text>
                     <View>
-                        {pokemon.types.map(({type}, index) => {
-                            const typeName = type.name.charAt(0).toUpperCase() + type.name.slice(1, type.name.length)
+                        {pokemonTypes !== null && pokemonTypes.map(({name: typeName}: any, index: number) => {
                             return <View key={`${pokemon.name}-${index}-type`}
                                          style={{
                                              alignSelf: 'flex-start',
@@ -178,7 +257,7 @@ const PokemonCard = React.memo(({pokemon, index, totalPokemons}: IPokemonCard): 
                     }}
                     resizeMode={FastImage.resizeMode.contain}
                 />
-                {/*Selected asset of the pokemon in the portal*/}
+                {/*Selected asset of the pokémon in the portal*/}
                 <PokemonAssetDetailed/>
             </View>
         </Pressable>
