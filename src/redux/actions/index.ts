@@ -1,7 +1,7 @@
 import {
   SET_FILTER_POKEMON_GENERATION,
-  SET_GENERATIONS,
-  SET_POKEMON_BY_GENERATIONS,
+  SET_GENERATIONS, SET_LOADING_PROGRESS,
+  SET_POKEMON_BY_GENERATIONS, SET_POKEMON_NAMES,
   SET_POKEMON_TYPES, SET_SELECTED_POKEMON
 } from '../constants'
 import {Generation, Pokemon, PokemonType} from "pokedex-promise-v2";
@@ -17,6 +17,17 @@ export const setFilterGeneration = (filterPokemonsGeneration: string) => ({
 export const setPokemonsByGeneration = (pokemons: Pokemon[]) => ({
   type: SET_POKEMON_BY_GENERATIONS,
   pokemons
+})
+export const setPokemonsNames = (pokemonsNames: any[]) => ({
+  type: SET_POKEMON_NAMES,
+  pokemonsNames
+})
+export const setLoadingProgress = (generationName: string, progress: number) => ({
+  type: SET_LOADING_PROGRESS,
+  loadingProgress: {
+    generationName,
+    progress
+  }
 })
 export const setSelectedPokemon = (pokemon: Pokemon | null) => ({
   type: SET_SELECTED_POKEMON,

@@ -7,7 +7,7 @@ import {
     setGenerations,
     setPokemonsByGeneration,
     setPokemonsTypes,
-    setFilterGeneration
+    setFilterGeneration, setPokemonsNames
 } from "../redux/actions";
 import {useDispatch, useSelector} from "react-redux";
 import {Pokedex} from "./Pokedex";
@@ -28,7 +28,7 @@ const LoadingView = ({message}: LoadingViewProps) => {
                 />
             </View>
             <View style={{alignItems: 'center', zIndex: 1}}>
-                <Text size={15}>Loading Pokedex, please wait</Text>
+                <Text size={15}>Chargement du Pokédex</Text>
                 <Text style={{marginTop: 8}} color={'rgba(0,0,0,.35)'}>{message}</Text>
             </View>
         </View>
@@ -39,18 +39,19 @@ function Init() {
     const {
         useGenerations,
         fetchAllPokemonTypes,
-        fetchAllPokemonsByGeneration
+        fetchAllPokemonsByGeneration,
+        fetchAllPokemonsNamesByGeneration
     } = ApiService()
 
     const dispatch = useDispatch()
 
-    const [loadingMessage, setLoadingMessage] = useState<string>('Loading pokemons types...')
+    const [loadingMessage, setLoadingMessage] = useState<string>('Chargement des Types de Pokemons')
     const [isPokedexLoaded, setIsPokedexLoaded] = useState<boolean>(false)
 
     /* TODO
         - we can generate an match an MD5 from server to check if pokemons / types / generations are complete
-          if not, we can download missing entities
-          we can also add an option in the settings to allow the user to download missing entities
+          if not, we can download missing entries
+          we can also add an option in the settings to allow the user to download missing entries
         - we can store our trust on pokemon generation, when a new gen is released, download pokemons and types with
     * */
 
@@ -63,7 +64,7 @@ function Init() {
      *
      */
     const getAllPokemonsTypes = useCallback(async () => {
-        setLoadingMessage('Loading pokemons types...')
+        setLoadingMessage('Chargement des Pokémons...')
 
         /*
         * TODO
@@ -73,7 +74,7 @@ function Init() {
         * */
 
         if (hasNewGenerationReleased) {
-            const {data: pokemonsTypes} = await fetchAllPokemonTypes()
+            const pokemonsTypes = await fetchAllPokemonTypes()
             //
             dispatch(setPokemonsTypes(pokemonsTypes))
         }
@@ -83,19 +84,29 @@ function Init() {
      *
      */
     const getAllPokemons = useCallback(async () => {
-        setLoadingMessage('Finding pokemons...')
         if (hasNewGenerationReleased) {
-            const pokemons = await fetchAllPokemonsByGeneration(generationsData, (generationName: string, progress: number) => setLoadingMessage(`Catching pokemons for ${generationName}... ${progress}%`))
+            setLoadingMessage(`Capture des Pokémons ...`)
+            const pokemons = await fetchAllPokemonsByGeneration(generationsData)
             dispatch(setPokemonsByGeneration(pokemons))
         }
     }, [generationsData, hasNewGenerationReleased])
-
+    /**
+     *
+     */
+    const getAllPokemonsNames = useCallback(async () => {
+        setLoadingMessage('Traduction des Pokémons...')
+        if (hasNewGenerationReleased) {
+            const pokemonsNames = await fetchAllPokemonsNamesByGeneration(generationsData)
+            dispatch(setPokemonsNames(pokemonsNames))
+        }
+    }, [generationsData, hasNewGenerationReleased])
     /**
      *
      */
     useEffect(() => {
         if (!!generationsData?.length && !loadingGeneration && !errorGeneration) {
             const fetchTypesAndPokemons = async () => {
+                await getAllPokemonsNames()
                 await getAllPokemonsTypes()
                 await getAllPokemons()
             }

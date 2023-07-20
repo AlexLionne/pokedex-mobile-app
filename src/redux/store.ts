@@ -1,4 +1,3 @@
-import applicationReducer from './reducers/application'
 import pokemonsReducer from './reducers/pokemons'
 import generationReducer from './reducers/generations'
 import selectionReducer from './reducers/selection'
