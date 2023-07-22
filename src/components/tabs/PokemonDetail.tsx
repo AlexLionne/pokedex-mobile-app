@@ -1,6 +1,5 @@
 import React, {JSX, useCallback, useEffect, useMemo, useRef} from "react";
 import BottomSheet, {BottomSheetModalProvider, BottomSheetScrollView} from "@gorhom/bottom-sheet";
-import {Text} from "../Text/Text";
 import {StyleSheet, View} from "react-native";
 import {useDispatch, useSelector} from "react-redux";
 import {setSelectedPokemon} from "../../redux/actions";
@@ -16,8 +15,12 @@ const PokemonDetail = ({}: IPokemonDetail): JSX.Element => {
     const bottomSheetRef = useRef<BottomSheet>(null);
 
     useEffect(() => {
-        if (selectedPokemon !== null && bottomSheetRef.current !== null) {
-            bottomSheetRef.current.snapToIndex(1, {duration: 1000})
+        if (bottomSheetRef.current !== null) {
+            if (selectedPokemon !== null) {
+                bottomSheetRef.current.snapToIndex(1, {duration: 750})
+            } else {
+                bottomSheetRef.current.forceClose({duration: 500})
+            }
         }
     }, [selectedPokemon, bottomSheetRef])
     // variables

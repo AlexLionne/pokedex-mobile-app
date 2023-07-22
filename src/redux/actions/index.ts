@@ -2,7 +2,7 @@ import {
   SET_FILTER_POKEMON_GENERATION,
   SET_GENERATIONS, SET_LOADING_PROGRESS,
   SET_POKEMON_BY_GENERATIONS, SET_POKEMON_NAMES,
-  SET_POKEMON_TYPES, SET_SELECTED_POKEMON
+  SET_POKEMON_TYPES, SET_SELECTED_CAROUSEL_POKEMON, SET_SELECTED_POKEMON
 } from '../constants'
 import {Generation, Pokemon, PokemonType} from "pokedex-promise-v2";
 
@@ -31,6 +31,11 @@ export const setLoadingProgress = (generationName: string, progress: number) => 
 })
 export const setSelectedPokemon = (pokemon: Pokemon | null) => ({
   type: SET_SELECTED_POKEMON,
+  pokemon: pokemon
+})
+
+export const setSelectedCarouselPokemon = (pokemon: Pokemon | null) => ({
+  type: SET_SELECTED_CAROUSEL_POKEMON,
   pokemon: pokemon
 })
 export const setPokemonsTypes = (pokemonsTypes: PokemonType[]) => ({
