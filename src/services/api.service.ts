@@ -1,6 +1,7 @@
 import {Generation, GenerationName, Pokemon, PokemonType} from "pokedex-promise-v2";
 import {useQuery} from "react-query";
 import {
+    API_ENDPOINT,
     DEFAULT_LANGUAGE,
     FETCH_ALL_GENERATIONS_KEY
 } from "../constants/constants";
@@ -10,7 +11,7 @@ import {setLoadingProgress} from "../redux/actions";
 
 
 const ApiService = (): any => {
-    const baseUrl = 'http://localhost:4000'
+    const baseUrl = API_ENDPOINT
 
     /**
      *
