@@ -1,4 +1,4 @@
-const DEFAULT_POKEMON_GENERATION = 'generation-v'
+const DEFAULT_POKEMON_GENERATION = 'generation-i'
 const DEFAULT_POKEMON_FILTER_TYPE = 'all'
 const DEFAULT_LANGUAGE = 'fr'
 const DEFAULT_POKEMONS_COLUMNS = 2

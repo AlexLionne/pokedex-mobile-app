@@ -3,11 +3,10 @@ import {useSelector} from "react-redux";
 import {PokemonCard} from "../cards/PokemonCard";
 import {DEFAULT_POKEMONS_COLUMNS} from "../../constants/constants";
 import {FlatList} from 'react-native'
-import {IApplicationReducerStore} from "../../redux/reducers/application";
 import {IPokemonReducerStore} from "../../redux/reducers/pokemons";
 import {Generation, Pokemon, PokemonSpecies} from "pokedex-promise-v2";
 import {IGenerationsReducerStore} from "../../redux/reducers/generations";
-import {ISelectionReducerStore, ISelectionStore} from "../../redux/reducers/selection";
+import {ISelectionReducerStore} from "../../redux/reducers/selection";
 
 interface IPokedexList {}
 

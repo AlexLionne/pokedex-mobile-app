@@ -11,6 +11,7 @@ import Carousel, {getInputRangeFromIndexes} from "react-native-snap-carousel";
 import FastImage from "react-native-fast-image";
 import {Ornament} from "../../assets/Ornament";
 import {Dots} from "../../assets/Dots";
+import {DEFAULT_POKEMON_GENERATION} from "../../constants/constants";
 
 
 interface IPokemonAssetDetailedProps {
@@ -36,7 +37,7 @@ const PokemonAssetDetailed = ({
     const {filterPokemonsGeneration}: any = useSelector((state: ISelectionReducerStore) => state.selection)
 
     const selectedGeneration = useMemo(() => {
-        return generations.find((generation: Generation) => generation.name === 'generation-iii')
+        return generations.find((generation: Generation) => generation.name === filterPokemonsGeneration)
     }, [generations, filterPokemonsGeneration])
     //
     const filteredPokemons = useMemo<Pokemon[]>(() => pokemons?.filter((pokemon: Pokemon) => {
@@ -79,7 +80,7 @@ const PokemonAssetDetailed = ({
     useEffect(() => {
         scaleAnimation.value = withTiming(3, {duration: 484, easing: Easing.inOut(Easing.linear)}, onAnimationEnd)
         translateX.value = withTiming(targetX - (80 / 2), {duration: 500, easing: Easing.inOut(Easing.linear)})
-        translateY.value = withTiming(targetY + (80 * 2) + 50, {
+        translateY.value = withTiming(targetY - 40, {
             duration: 500,
             easing: Easing.inOut(Easing.linear)
         })
@@ -109,6 +110,7 @@ const PokemonAssetDetailed = ({
     return <Portal hostName={"PokemonDetailBackgroundHost"}>
         <Animated.View
             style={[{
+                height: 80,
                 position: 'absolute',
                 left: hidePreview ? 0 : elementPosition.asset.pageX,
                 top: elementPosition.asset.pageY,

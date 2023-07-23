@@ -47,8 +47,6 @@ const PokemonFavourite = React.memo(({selectedCarouselPokemon}: IPokemonFavourit
     } = useSelector((state: IPokemonReducerStore) => state.pokemons)
     const [isFavourite, setFavourite] = useState(favouritePokemons.includes(selectedCarouselPokemon.id))
 
-    console.log(favouritePokemons)
-
     useEffect(() => {
         setFavourite(favouritePokemons.includes(selectedCarouselPokemon.id))
     }, [selectedCarouselPokemon.id])
@@ -65,7 +63,6 @@ const PokemonFavourite = React.memo(({selectedCarouselPokemon}: IPokemonFavourit
 }, (p, n) => {
     const shouldUpdate = p.selectedCarouselPokemon.id !== n.selectedCarouselPokemon.id
 
-    console.log( p.selectedCarouselPokemon.id, n.selectedCarouselPokemon.id)
     return !shouldUpdate
 })
 const TypesList = React.memo(({pokemonTypes, pokemonName}: ITypesListProps) => {
@@ -277,11 +274,8 @@ const PokemonDetailed = React.memo(({
                 height: 120,
                 zIndex: 5
             }, animatedStyles]}>
-
             <Animated.View style={animatedPokemonNameStyles}
                            key={`pokemon-name-${selectedCarouselPokemon.name}`}
-                           entering={FadeIn.duration(500).easing(Easing.inOut(Easing.ease))}
-                           exiting={FadeOut.duration(500).easing(Easing.inOut(Easing.ease))}
             >
                 <Text size={15} color={'white'} style={{marginBottom: 14}}>{selectedPokemonName}</Text>
             </Animated.View>

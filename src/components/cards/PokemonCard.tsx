@@ -12,8 +12,8 @@ import {Portal} from "@gorhom/portal";
 import {ISelectionReducerStore} from "../../redux/reducers/selection";
 import {IPokemonReducerStore} from "../../redux/reducers/pokemons";
 import {DEFAULT_LANGUAGE} from "../../constants/constants";
-import {PokemonAssetDetailed} from "../pokemons/PokemonAssetDetailed";
-import {PokemonDetailed} from "../pokemons/PokemonDetailed";
+import {PokemonAssetDetailed} from "./PokemonAssetDetailed";
+import {PokemonDetailed} from "./PokemonDetailed";
 
 
 interface IPokemonCardProps {
@@ -77,14 +77,14 @@ const PokemonCard = React.memo(({pokemon, index, totalPokemons}: IPokemonCardPro
     const pokemonName = useMemo(() => translations[pokemon.name].names[DEFAULT_LANGUAGE], [translations, pokemon.name])
 
     let backgroundColor = useMemo(() => {
-        const [pokemonType]: PokemonType[] = pokemon.types.sort((primaryType: PokemonType, secondaryType: PokemonType): any => (secondaryType.slot - primaryType.slot))
+        const [pokemonType]: PokemonType[] = pokemon.types.sort((primaryType: PokemonType, secondaryType: PokemonType): any => (primaryType.slot - secondaryType.slot))
         // @ts-ignore
         return colors.pokemonTypes[pokemonType.type.name].color
     }, [pokemon])
 
     const selectedBackgroundColor = useMemo(() => {
         if (!selectedCarouselPokemon) return null
-        const [pokemonType]: PokemonType[] = selectedCarouselPokemon.types.sort((primaryType: PokemonType, secondaryType: PokemonType): any => (secondaryType.slot - primaryType.slot))
+        const [pokemonType]: PokemonType[] = selectedCarouselPokemon.types.sort((primaryType: PokemonType, secondaryType: PokemonType): any => (primaryType.slot - secondaryType.slot))
         // @ts-ignore
         return colors.pokemonTypes[pokemonType.type.name].color
     }, [selectedCarouselPokemon])
@@ -171,11 +171,11 @@ const PokemonCard = React.memo(({pokemon, index, totalPokemons}: IPokemonCardPro
                     </View>
                 </View>
 
-                {<PokemonDetailed
+                <PokemonDetailed
                     selectedCarouselPokemon={selectedCarouselPokemon}
                     totalPokemons={totalPokemons}
                     elementPosition={elementPosition}
-                />}
+                />
 
             </View>
             <View style={{
@@ -198,7 +198,7 @@ const PokemonCard = React.memo(({pokemon, index, totalPokemons}: IPokemonCardPro
                     }}
                     resizeMode={FastImage.resizeMode.contain}
                 />
-                {/*Selected asset of the pokémon in the portal [width / 2, height / 3 + 50]*/}
+                {/*Selected asset of the Pokemon in the portal*/}
                 {/*pokemons Carousel*/}
                 {<PokemonAssetDetailed
                     selectedPokemon={selectedPokemon}
