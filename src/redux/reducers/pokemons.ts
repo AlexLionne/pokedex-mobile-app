@@ -1,4 +1,4 @@
-import {SET_LOADING_PROGRESS, SET_POKEMON_BY_GENERATIONS, SET_POKEMON_NAMES, SET_POKEMON_TYPES} from "../constants";
+import {SET_POKEMON_BY_GENERATIONS, SET_POKEMON_FAVOURITE, SET_POKEMON_NAMES, SET_POKEMON_TYPES} from "../constants";
 import {Pokemon, PokemonType} from "pokedex-promise-v2";
 
 export interface IPokemonReducerStore {
@@ -9,9 +9,10 @@ export interface IPokemonStore {
     pokemons: Pokemon[] | []
     pokemonsTypes: PokemonType[] | []
     pokemonsNames: any
+    favouritePokemons: number[]
 }
 
-const initialState: IPokemonStore = {pokemons: [], pokemonsTypes: [], pokemonsNames: {}};
+const initialState: IPokemonStore = {pokemons: [], pokemonsTypes: [], pokemonsNames: {}, favouritePokemons: []};
 
 const pokemonsReducer = (state = initialState, action: any) => {
     switch (action.type) {
@@ -32,6 +33,12 @@ const pokemonsReducer = (state = initialState, action: any) => {
             return {
                 ...state,
                 pokemonsTypes: action.pokemonsTypes
+            }
+        case SET_POKEMON_FAVOURITE:
+            const indexOf = state.favouritePokemons.findIndex((pokemonId: number) => pokemonId === action.pokemonId)
+            return {
+                ...state,
+                favouritePokemons: indexOf > -1 ? [...state.favouritePokemons.slice(0, indexOf), ...state.favouritePokemons.slice(indexOf + 1, state.favouritePokemons.length)] : [...state.favouritePokemons, action.pokemonId]
             }
         default:
             return state;

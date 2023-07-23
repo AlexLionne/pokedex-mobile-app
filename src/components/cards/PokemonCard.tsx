@@ -1,4 +1,4 @@
-import React, {JSX, useCallback, useEffect, useMemo, useState} from "react";
+import React, {JSX, useCallback, useMemo, useState} from "react";
 import {Pokemon, PokemonType} from "pokedex-promise-v2";
 import {Text} from "../Text/Text";
 import {Pressable, useWindowDimensions, View} from "react-native";
@@ -16,14 +16,47 @@ import {PokemonAssetDetailed} from "../pokemons/PokemonAssetDetailed";
 import {PokemonDetailed} from "../pokemons/PokemonDetailed";
 
 
-interface IPokemonCard {
+interface IPokemonCardProps {
     index: number
     pokemon: Pokemon
     totalPokemons: number
 }
 
+interface CardBackgroundColorProps {
+    pokemon: Pokemon
+    children: JSX.Element | JSX.Element[]
+    onPress: (event: any) => void
+    index: number
+}
 
-const PokemonCard = React.memo(({pokemon, index, totalPokemons}: IPokemonCard): JSX.Element => {
+
+const CardBackgroundColor = React.memo(({pokemon, index, onPress, children}: CardBackgroundColorProps) => {
+    const {width} = useWindowDimensions()
+
+    let backgroundColor = useMemo(() => {
+        const [pokemonType]: PokemonType[] = pokemon.types.sort((primaryType: PokemonType, secondaryType: PokemonType): any => (secondaryType.slot - primaryType.slot))
+        // @ts-ignore
+        return colors.pokemonTypes[pokemonType.type.name].color
+    }, [pokemon])
+
+    return <Pressable
+        onPress={onPress}
+        style={{
+            overflow: 'hidden',
+            backgroundColor: backgroundColor,
+            marginBottom: 12,
+            marginRight: index % 2 ? 0 : 12,
+            width: (width / 2) - 30,
+            borderRadius: 15,
+            paddingHorizontal: 14,
+            paddingVertical: 8,
+            height: 120,
+            position: 'relative',
+        }}>
+        {children}
+    </Pressable>
+}, (p, n) => false)
+const PokemonCard = React.memo(({pokemon, index, totalPokemons}: IPokemonCardProps): JSX.Element => {
     const {width, height} = useWindowDimensions()
     const dispatch = useDispatch()
 
@@ -42,7 +75,6 @@ const PokemonCard = React.memo(({pokemon, index, totalPokemons}: IPokemonCard): 
     }), [pokemonsNames, pokemon.name])
 
     const pokemonName = useMemo(() => translations[pokemon.name].names[DEFAULT_LANGUAGE], [translations, pokemon.name])
-    const pokemonGenus = useMemo(() => translations[pokemon.name].genus[DEFAULT_LANGUAGE], [translations, pokemon.name])
 
     let backgroundColor = useMemo(() => {
         const [pokemonType]: PokemonType[] = pokemon.types.sort((primaryType: PokemonType, secondaryType: PokemonType): any => (secondaryType.slot - primaryType.slot))
@@ -110,21 +142,7 @@ const PokemonCard = React.memo(({pokemon, index, totalPokemons}: IPokemonCard): 
     *
     * */
     return <View>
-        <Pressable
-            onPress={onPress}
-            style={{
-                overflow: 'hidden',
-                backgroundColor: backgroundColor,
-                marginBottom: 12,
-                marginRight: index % 2 ? 0 : 12,
-                width: (width / 2) - 30,
-                borderRadius: 15,
-                paddingHorizontal: 14,
-                paddingVertical: 8,
-                height: 120,
-                position: 'relative',
-            }}>
-
+        <CardBackgroundColor index={index} onPress={onPress} pokemon={pokemon}>
             <View style={{flex: 0, flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'flex-end'}}>
                 <Text size={14} color={'rgba(0,0,0,.5)'} bold>{`#${pokemonId}`}</Text>
             </View>
@@ -188,7 +206,7 @@ const PokemonCard = React.memo(({pokemon, index, totalPokemons}: IPokemonCard): 
                     pokemon={pokemon}
                     elementPosition={elementPosition}/>}
             </View>
-        </Pressable>
+        </CardBackgroundColor>
         {/*POKEMON DETAIL PLACEHOLDER*/}
         <Portal hostName={"PokemonDetailBackgroundHost"}>
             {selectedPokemon && selectedPokemon.name === pokemon.name && (

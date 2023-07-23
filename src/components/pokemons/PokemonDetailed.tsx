@@ -1,10 +1,19 @@
 import {TouchableOpacity, useWindowDimensions, View} from "react-native";
 import React, {useEffect, useImperativeHandle, useMemo, useRef, useState} from "react";
-import Animated, {Easing, useAnimatedStyle, useSharedValue, withDelay, withTiming} from "react-native-reanimated";
+import Animated, {
+    Easing,
+    FadeIn,
+    FadeOut, SlideInRight,
+    useAnimatedStyle,
+    useSharedValue,
+    withDelay,
+    withTiming, ZoomIn, ZoomInRotate, ZoomOut
+} from "react-native-reanimated";
 import {useDispatch, useSelector} from "react-redux";
 import {Portal} from "@gorhom/portal";
-import {setSelectedCarouselPokemon, setSelectedPokemon} from "../../redux/actions";
+import {setPokemonFavourite, setSelectedCarouselPokemon, setSelectedPokemon} from "../../redux/actions";
 import {BackIcon} from "../../assets/BackIcon";
+import {HeartIcon} from 'react-native-heroicons/outline'
 import {Text} from "../Text/Text";
 import {Pokemon, PokemonType} from "pokedex-promise-v2";
 import {IPokemonReducerStore} from "../../redux/reducers/pokemons";
@@ -27,7 +36,38 @@ interface ITagProps {
     children: any
     tagKey: string
 }
+interface IPokemonFavouriteProps {
+    selectedCarouselPokemon: Pokemon
+}
 
+const PokemonFavourite = React.memo(({selectedCarouselPokemon}: IPokemonFavouriteProps) => {
+    const dispatch = useDispatch()
+    const {
+        favouritePokemons
+    } = useSelector((state: IPokemonReducerStore) => state.pokemons)
+    const [isFavourite, setFavourite] = useState(favouritePokemons.includes(selectedCarouselPokemon.id))
+
+    console.log(favouritePokemons)
+
+    useEffect(() => {
+        setFavourite(favouritePokemons.includes(selectedCarouselPokemon.id))
+    }, [selectedCarouselPokemon.id])
+
+    return <View
+        style={{position: 'absolute', right: 24, top: 112, zIndex: 4}}>
+        <TouchableOpacity onPress={() => {
+            setFavourite(!isFavourite)
+            dispatch(setPokemonFavourite(selectedCarouselPokemon.id))
+        }}>
+            <HeartIcon color={'white'} size={25} fill={isFavourite ? 'white' : 'transparent'}/>
+        </TouchableOpacity>
+    </View>
+}, (p, n) => {
+    const shouldUpdate = p.selectedCarouselPokemon.id !== n.selectedCarouselPokemon.id
+
+    console.log( p.selectedCarouselPokemon.id, n.selectedCarouselPokemon.id)
+    return !shouldUpdate
+})
 const TypesList = React.memo(({pokemonTypes, pokemonName}: ITypesListProps) => {
     const [tags, setTags] = useState<any>({})
     const tagsRef = useRef<any>({})
@@ -42,38 +82,36 @@ const TypesList = React.memo(({pokemonTypes, pokemonName}: ITypesListProps) => {
         }
     }, [tags, tagsRef.current, pokemonTypes])
 
-    return pokemonTypes.map(({name: typeName}: { name: any }, index: number) => {
-        return (
-            <TypeTag typeName={typeName}
-                     index={index}
-                     tagKey={`${pokemonName}-${typeName}-${index}`}
-                     ref={(ref: any) => {
-                         tagsRef.current[index] = ref
-                     }}
-                     key={`${pokemonName}-${typeName}-${index}`}>
-                <View
-                    onLayout={(event) => {
-                        const width = event.nativeEvent?.layout?.width
-                        setTags((tags: any) => ({
-                            ...tags,
-                            [index]: {x: width + 8, y: -29}
-                        }))
-                    }}
-                    style={{
-                        alignSelf: 'flex-start',
-                        backgroundColor: 'rgba(255,255,255,.2)',
-                        paddingHorizontal: 12,
-                        paddingVertical: 4,
-                        borderRadius: 22,
-                        marginBottom: 8,
-                    }}>
-                    <Text color={'white'} size={10}>{typeName}</Text>
-                </View>
-            </TypeTag>
-        )
-    })
+    return pokemonTypes.map(({name: typeName}: { name: any }, index: number) => (
+        <TypeTag typeName={typeName}
+                 index={index}
+                 tagKey={`${pokemonName}-${typeName}}`}
+                 ref={(ref: any) => {
+                     tagsRef.current[index] = ref
+                 }}
+                 key={`${pokemonName}-${typeName}}`}>
+            <View
+                onLayout={(event) => {
+                    const width = event.nativeEvent?.layout?.width
+                    setTags((tags: any) => ({
+                        ...tags,
+                        [index]: {x: width + 8, y: -29}
+                    }))
+                }}
+                style={{
+                    alignSelf: 'flex-start',
+                    backgroundColor: 'rgba(255,255,255,.2)',
+                    paddingHorizontal: 12,
+                    paddingVertical: 4,
+                    borderRadius: 22,
+                    marginBottom: 8,
+                }}>
+                <Text color={'white'} size={10}>{typeName}</Text>
+            </View>
+        </TypeTag>
+    ))
 }, (p, n) => {
-    const shouldUpdate = p.pokemonName === n.pokemonName
+    const shouldUpdate = (p.pokemonName !== n.pokemonName)
 
     return !shouldUpdate
 })
@@ -85,7 +123,7 @@ const TypeTag = React.memo(React.forwardRef(({typeName, index, children, tagKey}
     useImperativeHandle(ref, () => {
         return {
             animate: (x: number, y: number) => {
-                translateX.value = withTiming(x, {duration: 500, easing: Easing.inOut(Easing.ease)})
+                translateX.value = withTiming(x, {duration: 250, easing: Easing.inOut(Easing.ease)})
                 translateY.value = withTiming(y, {duration: 500, easing: Easing.inOut(Easing.ease)})
             }
         }
@@ -94,11 +132,15 @@ const TypeTag = React.memo(React.forwardRef(({typeName, index, children, tagKey}
         transform: [{translateX: translateX.value || 0}, {translateY: translateY.value}]
     }), [translateX, translateY]);
 
-    return <Animated.View key={`${typeName}-${tagKey}`} style={[animatedStyle]}>
+    return <Animated.View
+        entering={FadeIn.duration(500).easing(Easing.inOut(Easing.ease))}
+        exiting={FadeOut.duration(500).easing(Easing.inOut(Easing.ease))}
+        key={`${typeName}-${tagKey}`} style={[animatedStyle]}>
         {children}
     </Animated.View>
 }), (p, n) => {
-    const shouldUpdate = p.tagKey === n.tagKey
+    // has the tag changed through the Pokemon ?
+    const shouldUpdate = (p.tagKey !== n.tagKey)
 
     return !shouldUpdate
 })
@@ -114,8 +156,9 @@ const PokemonDetailed = React.memo(({
 
     const {
         pokemonsNames,
-        pokemonsTypes: storePokemonTypes
+        pokemonsTypes: storePokemonTypes,
     } = useSelector((state: IPokemonReducerStore) => state.pokemons)
+
 
     const selectedTranslations = useMemo(() => pokemonsNames.find((name: any) => {
         const [pokemonKey] = Object.keys(name)
@@ -155,10 +198,6 @@ const PokemonDetailed = React.memo(({
     const translateY = useSharedValue<any>(pageY);
 
     useEffect(() => {
-        console.log('useEffect PokemonDetailed')
-    }, [])
-
-    useEffect(() => {
         scaleAnimation.value = withTiming(2.5, {duration: 500, easing: Easing.inOut(Easing.ease)})
         translateX.value = withTiming(targetX, {duration: 500, easing: Easing.inOut(Easing.ease)})
         translateY.value = withTiming(targetY, {duration: 500, easing: Easing.inOut(Easing.ease)})
@@ -190,15 +229,20 @@ const PokemonDetailed = React.memo(({
 
 
     return <Portal hostName={"PokemonDetailBackgroundHost"}>
-        <View style={{position: 'absolute', left: 24, top: 112, zIndex: 4}}>
+        <Animated.View
+            style={{position: 'absolute', left: 24, top: 112, zIndex: 4}}>
             <TouchableOpacity onPress={() => {
                 dispatch(setSelectedPokemon(null))
                 dispatch(setSelectedCarouselPokemon(null))
             }}>
                 <BackIcon color={'white'} width={44 / 1.5} height={28 / 1.5}/>
             </TouchableOpacity>
-        </View>
+        </Animated.View>
+        <PokemonFavourite selectedCarouselPokemon={selectedCarouselPokemon}/>
         <Animated.View
+            key={`pokemon-id-${selectedCarouselPokemon.name}`}
+            entering={SlideInRight.duration(500).easing(Easing.inOut(Easing.ease))}
+            exiting={FadeOut.duration(500).easing(Easing.inOut(Easing.ease))}
             style={[{
                 flex: 1,
                 position: 'absolute',
@@ -209,6 +253,9 @@ const PokemonDetailed = React.memo(({
             <Text size={22} color={'white'} bold>{`#${selectedPokemonId}`}</Text>
         </Animated.View>
         <Animated.View
+            key={`pokemon-genus-${selectedCarouselPokemon.name}`}
+            entering={SlideInRight.duration(500).delay(250).easing(Easing.inOut(Easing.ease))}
+            exiting={FadeOut.duration(500).delay(250).easing(Easing.inOut(Easing.ease))}
             style={[{
                 width,
                 position: 'absolute',
@@ -221,6 +268,7 @@ const PokemonDetailed = React.memo(({
             </View>
         </Animated.View>
         <Animated.View
+
             style={[{
                 position: 'absolute',
                 left: elementPosition.asset.pageX,
@@ -230,7 +278,11 @@ const PokemonDetailed = React.memo(({
                 zIndex: 5
             }, animatedStyles]}>
 
-            <Animated.View style={animatedPokemonNameStyles}>
+            <Animated.View style={animatedPokemonNameStyles}
+                           key={`pokemon-name-${selectedCarouselPokemon.name}`}
+                           entering={FadeIn.duration(500).easing(Easing.inOut(Easing.ease))}
+                           exiting={FadeOut.duration(500).easing(Easing.inOut(Easing.ease))}
+            >
                 <Text size={15} color={'white'} style={{marginBottom: 14}}>{selectedPokemonName}</Text>
             </Animated.View>
 
